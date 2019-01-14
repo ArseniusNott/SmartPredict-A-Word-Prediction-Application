@@ -1,35 +1,5 @@
----
-title: 'SmartPredict: Sampling Methods, N-Gram Generation and Back-end Logic Creation'
-author: "Alexander N. Villasoto"
-date: "15 January 2019"
-output:
-  html_document:
-    code_folding: show
-    toc: true
-    toc_float: true
----
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
-
-## I. Methods of Sampling
-
-The output of the author's [previous analysis](https://arseniusnott.github.io/Exploring-the-Sample-English-Corpora-for-Predictive-Text-Modeling/) are three .csv files (for blog, for news, and for twitter corpus) that include one-gram tokens that are cleaned and flagged whether they are English or not.
-
-Unfortunately, the samples acquired from the three raw corpus are quite heavy for an expected prototype that must run on environments with small footprints. So the author is sacrificing accuracy for app efficiency by lowering samples sizes. 
-
-Also, the author observed that expanding contractions that are missed by both Grady Augmented and WordNet English dictionaries is not a good idea for contemporary next-word prediction app so the author modified the tokenization process by adding these newfound contractions into the custom_english_dictionary and removing the function that expands these tokens.
-
-Lastly, the expanded form for <i>can't</i> that is previously applied to analysis is <i>can not</i>. But in predictive terms, <i>cannot</i> is the most appropriate. So before any tokenization and cleaning happens, the author modified the contraction-expanded pair for can't.
-
-To cut to the chase, here is the full code that will generate smaller samples from raw data. Download the files in this [this](https://www.dropbox.com/sh/h5ie0xg0hknj8xl/AAAB6v310DdgvgHkoHKgeIuDa?dl=0) folder and place it in the <i>data</i> directory for the following code to work.
-
-```{r 01, echo=TRUE, eval=FALSE}
 set.seed(1234)
 options(width = 100)
-
-# setwd("ABSOLUTE_LOCATION_OF_THIS_REPOSITORY")
 
 # libraries
 library(readr)
@@ -243,25 +213,25 @@ custom_key_contractions_second_iteration <- function() {
 # update can't to cannot NOT can not
 custom_key_contractions_v2 <- change_contraction(custom_key_contractions_second_iteration(), 
                                               "can't", "cannot")
-save_as_csv(custom_key_contractions_v2, file_path = "./../data/custom_key_contractions_v2.csv")
+save_as_csv(custom_key_contractions_v2, file_path = "./data/custom_key_contractions_v2.csv")
 
 # custom english dictionary
-custom_english_dictionary <- read_csv("./../data/custom_english_dictionary.csv")
+custom_english_dictionary <- read_csv("./data/custom_english_dictionary.csv")
 # add common key contractions to custom english dictionary
 custom_english_dictionary_v2 <- 
   data_frame(ngrams = c(custom_english_dictionary$ngrams, 
                         custom_key_contractions_v2$contraction))
 save_as_csv(custom_english_dictionary_v2, 
-            file_path = "./../data/custom_english_dictionary_v2.csv")
+            file_path = "./data/custom_english_dictionary_v2.csv")
 
 
 
 # small sample per corpus
 
 # raw file locations
-blog_us_raw_input_file <- "./../data/en_US.blogs.txt"
-twitter_us_raw_input_file <- "./../data/en_US.twitter.txt"
-news_us_raw_input_file <- "./../data/en_US.news.txt"
+blog_us_raw_input_file <- "~/Dropbox/week_2/data/en_US.blogs.txt"
+twitter_us_raw_input_file <- "~/Dropbox/week_2/data/en_US.twitter.txt"
+news_us_raw_input_file <- "~/Dropbox/week_2/data/en_US.news.txt"
 
 # Use the custom_english_dictionary and custom_key_contractions to reclean
 # blog, twitter and news corpora (0.27, 0.22, 0.24) for the data analysis part
@@ -274,7 +244,7 @@ blog_cleaned_small <- tokenize_and_clean_corpus(
   english_language = custom_english_dictionary_v2$ngrams)
 # save to file
 write_csv(blog_cleaned_small, 
-          path = "./../data/blog_cleaned_small.csv")
+          path = "./data/blog_cleaned_small.csv")
 
 twitter_cleaned_small <- tokenize_and_clean_corpus(
   input_file_location = twitter_us_raw_input_file, 
@@ -283,7 +253,7 @@ twitter_cleaned_small <- tokenize_and_clean_corpus(
   english_language = custom_english_dictionary_v2$ngrams)
 # save to file
 write_csv(twitter_cleaned_small, 
-          path = "./../data/twitter_cleaned_small.csv")
+          path = "./data/twitter_cleaned_small.csv")
 
 news_cleaned_small <- tokenize_and_clean_corpus(
   input_file_location = news_us_raw_input_file, 
@@ -292,112 +262,4 @@ news_cleaned_small <- tokenize_and_clean_corpus(
   english_language = custom_english_dictionary_v2$ngrams)
 # save to file
 write_csv(news_cleaned_small, 
-          path = "./../data/news_cleaned_small.csv")
-
-```
-
-## II. N-Gram Generation
-
-Now that we have created smaller samples, let us now generate ngrams to be used by the actual application. 
-
-Since we initially structured our generated samples using one-gram tokens, we can easily generate n-grams using tokenized_ngram function above by supplying how many words per token and setting retokenize to true. The author then converted these unified n-grams into frequency-sorted n-grams and save them as .csv files.
-
-The author generated the compiled frequency-sorted one-gram, two-gram, three-gram and four-gram files using the code below:
-
-```{r 02, echo=TRUE, eval=FALSE}
-
-# file names for the previously-generated samples
-blog_cleaned_file_name <- "./../data/blog_cleaned_small.csv"
-twitter_cleaned_file_name <- "./../data/twitter_cleaned_small.csv"
-news_cleaned_file_name <- "./../data/news_cleaned_small.csv"
-
-# separate n-grams into one-column-per-word fashion
-separate_ngrams = function(tokenized_ngram, n) {
-  ngram_columns <- paste("word", 1:n, sep = "")
-  tokenized_ngram %>%
-    separate(ngrams, ngram_columns, sep = " ")
-}
-
-# sort by frequency and separate ngrams into word columns
-sort_by_frequency <- function(tokenized_ngram, n) {
-  # if one word per token
-  if (n == 1) {
-    tokenized_ngram %>%
-      count(ngrams, sort = TRUE)
-  } else {
-    tokenized_ngram %>%
-      count(ngrams, sort = TRUE) %>%
-      separate_ngrams(n)
-  }
-}
-
-blog_cleaned <- read_csv(file = blog_cleaned_file_name, col_names = TRUE, 
-                         col_types = cols(
-                           ngrams = col_character(),
-                           is_english = col_logical()
-                         ))
-twitter_cleaned <- read_csv(file = twitter_cleaned_file_name, col_names = TRUE, 
-                            col_types = cols(
-                              ngrams = col_character(),
-                              is_english = col_logical()
-                            ))
-news_cleaned <- read_csv(file = twitter_cleaned_file_name, col_names = TRUE, 
-                         col_types = cols(
-                           ngrams = col_character(),
-                           is_english = col_logical()
-                         ))
-
-corpora_one_gram <- bind_rows(blog_cleaned, twitter_cleaned, news_cleaned) %>%
-  filter(is_english == TRUE) %>%
-  mutate(is_english = NULL)
-corpora_two_gram <- tokenize_ngram(data = corpora_one_gram, n = 2, 
-                                   retokenize = TRUE)
-corpora_three_gram <- tokenize_ngram(data = corpora_one_gram, n = 3, 
-                                     retokenize = TRUE)
-corpora_four_gram <- tokenize_ngram(data = corpora_one_gram, n = 4, 
-                                    retokenize = TRUE)
-corpora_five_gram <- tokenize_ngram(data = corpora_one_gram, n = 5, 
-                                    retokenize = TRUE)
-
-# frequency sort
-corpora_one_gram_frequency_sorted <- 
-  sort_by_frequency(corpora_one_gram, n = 1)
-corpora_two_gram_frequency_sorted <- 
-  sort_by_frequency(corpora_two_gram, n = 2)
-corpora_three_gram_frequency_sorted <- 
-  sort_by_frequency(corpora_three_gram, n = 3)
-corpora_four_gram_frequency_sorted <- 
-  sort_by_frequency(corpora_four_gram, n = 4)
-corpora_five_gram_frequency_sorted <- 
-  sort_by_frequency(corpora_five_gram, n = 5)
-
-# save as .csv files
-save_as_csv(corpora_one_gram_frequency_sorted, 
-            file_path = "./../data/corpora_one_gram_frequency_sorted.csv")
-save_as_csv(corpora_two_gram_frequency_sorted, 
-            file_path = "./../data/corpora_two_gram_frequency_sorted.csv")
-save_as_csv(corpora_three_gram_frequency_sorted, 
-            file_path = "./../data/corpora_three_gram_frequency_sorted.csv")
-save_as_csv(corpora_four_gram_frequency_sorted, 
-            file_path = "./../data/corpora_four_gram_frequency_sorted.csv")
-save_as_csv(corpora_five_gram_frequency_sorted, 
-            file_path = "./../data/corpora_five_gram_frequency_sorted.csv")
-```
-
-## III. Creating the Backend Logic
-
-Our prediction algorithm will be using n-gram model with frequency lookup similar to the plots shown above. By using the frequency-sorted n-gram files generated above, we first use a four-gram model to predict the next word. Three candidates will be filtered from top results, each with decreasing probability of being the next word. If no matching four-grams can be found, then the algorithm would revert to three-grams, two-grams and one grams. 
-
-To prevent the application from returning empty results, the author returns the [three most common words in English](https://www.quora.com/Whats-the-most-common-word-in-the-English-Language), <i>the</i>, <i>to</i> and <i>and</i> in that order. Note that we are interested in the order of the results from most-likely to least so we would not return the probabilities themselves, only the words. 
-
-You can see the implementation at the <i>app.R</i> file at the parent directory. 
-
-## IV. Summary
-
-Here are the changes that the author employed for a robust and reasonably accurate SmartPredict application:
-
-* Lower the sample size for each corpus so the sample now for blog, twitter and news corpora will be 0.7, 0.02 and 0.04 of the corpus' total tokens respectively
-* Replace expanded form of <i>can't</i> from <i>can not</i> to <i>cannot</i>
-* Augment the custom_english_dictionary with newfound contractions
-* Remove the function that expands contracted tokens
-* Summarize results into one-gram, two-gram, three-gram and four-gram files to be fed into the app. 
+          path = "./data/news_cleaned_small.csv")

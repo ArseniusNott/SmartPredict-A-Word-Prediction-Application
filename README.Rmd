@@ -9,7 +9,7 @@ output: github_document
 
 * The application data can be downloaded [here](https://www.dropbox.com/s/y52j8gnqhgroq02/data.tar.gz?dl=0). Extract the downloaded tar file to the directory before running the application.
 * This data product is declared as a future work from [this](https://arseniusnott.github.io/Exploring-the-Sample-English-Corpora-for-Predictive-Text-Modeling/) analysis. 
-* Several changes have been made from the previous analysis to make sure that the app is accurate as well as efficient. You can find the documentation of succeeding changes [here]().
+* Several changes have been made from the previous analysis to make sure that the app is accurate as well as efficient. You can find the documentation of succeeding changes [here](https://arseniusnott.github.io/SmartPredict-A-Word-Prediction-Application/).
 * THIS IS PURELY MY WORK. If you want to know more information about this project, you can email me [here](mailto:anvillasoto@gmail.com) or open a GitHub issue by visiting [this](https://github.com/ArseniusNott/SmartPredict-A-Word-Prediction-Application/issues) link.
 
 
