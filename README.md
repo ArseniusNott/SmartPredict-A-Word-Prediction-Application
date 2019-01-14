@@ -1,0 +1,46 @@
+SmartPredict: A Smart Word Prediction Application
+================
+Alexander N. Villasoto
+15 January 2019
+
+Notes:
+------
+
+-   The application data can be downloaded [here](https://www.dropbox.com/s/y52j8gnqhgroq02/data.tar.gz?dl=0). Extract the downloaded tar file to the directory before running the application.
+-   This data product is declared as a future work from [this](https://arseniusnott.github.io/Exploring-the-Sample-English-Corpora-for-Predictive-Text-Modeling/) analysis.
+-   Several changes have been made from the previous analysis to make sure that the app is accurate as well as efficient. You can find the documentation of succeeding changes [here]().
+-   THIS IS PURELY MY WORK. If you want to know more information about this project, you can email me [here](mailto:anvillasoto@gmail.com) or open a GitHub issue by visiting [this](https://github.com/ArseniusNott/SmartPredict-A-Word-Prediction-Application/issues) link.
+
+Data Product Overview
+---------------------
+
+-   SmartPredict is an application that utilizes [HC Corpora](http://web.archive.org/web/20160318133851/http://www.corpora.heliohost.org:80/aboutcorpus.html) to make a model that would simulate aided word prediction via web interface.
+-   HC Corpora is a combination of blog, Twitter, and news datasets that are [processed, cleaned and sampled](http://rpubs.com/Eulerium/456745) by the author to be used in this application.
+-   Model uses a 13% sample from the cleaned corpora (7% from blog, 2% from twitter and 4% from news tokenized and cleaned corpuses).
+
+Model Building and Performance
+------------------------------
+
+-   The application uses n-gram model with frequency lookup.
+-   I initially generated four-gram model from a frequency-arranged tokens to predict the next word.
+-   Three candidates will be filtered from top results, each with decreasing probability of being the next word.
+-   If no matching four-grams can be found, then the algorithm would revert to three-grams, two-grams and one-grams.
+-   Obtaining 100 samples from the Twitter dataset, the model reports 22% accuracy with a runtime of 32.6784 seconds.
+
+The Application
+---------------
+
+<img src="./docs/figures/app_preview.png" width="531" style="display: block; margin: auto;" />
+
+-   The web app contains a single text box with three buttons on top.
+-   The most probable next-word returned from the server will then be supplied as value of the middle button, the second and third words will then be supplied to left and right buttons respectively.
+-   User can click on these buttons to aid in fast typing.
+-   SmartPredict application demo can be found [here](https://arsenius.shinyapps.io/SmartPredict/).
+
+Conclusion
+----------
+
+-   Using a decent amout of cleaned sample, we can build a model that can be used in useful applications like SmartPredict.
+-   The application is deployed via [Shiny](https://arsenius.shinyapps.io/SmartPredict/), a free-tier data product platform from RStudio using with 1 GB memory application, thus it can be run on environments with smaller footprint.
+-   We can improve the app's predictive accuracy by obtaining the most recent corpus from wide variety of sources and increase the sample size while also considering the memory as well as storage constraints.
+-   We can also develop a multilingual SmartPredict application using corpus from different language sources.

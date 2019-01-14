@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <title>SmartPredict: A Word Prediction Application</title>
+
+
+    <!--Scripts-->
+    <script src="shared/json2-min.js"></script>
+    <script src="shared/jquery.min.js"></script>
+    <link href="shared/shiny.css" rel="stylesheet" />
+    <script src="shared/shiny.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+      integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+      crossorigin="anonymous"
+    />
+    <link href="deps/css/bootstrap.min.css" />
+    <script
+      src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+      integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+      crossorigin="anonymous"
+    ></script>
+    
+
+    <!--Custom CSS-->
+    <link href="./deps/css/custom.css" rel="stylesheet" />
+    <!-- For FontAwesome -->
+    <link href="./deps/css/font-awesome.min.css" rel="stylesheet" />
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+      <a class="navbar-brand d-md-none" href="#">SmartPredict</a>
+      <button
+        class="navbar-toggler ml-auto"
+        type="button"
+        data-toggle="collapse"
+        data-target="#navbarNavAltMarkup"
+        aria-controls="navbarNavAltMarkup"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="d-md-flex d-block w-100">
+        <div
+          class="collapse navbar-collapse mx-auto w-auto justify-content-center"
+          id="navbarNavAltMarkup"
+        >
+          <div class="navbar-nav">
+            <a
+              class="btn nav-item nav-link"
+              data-toggle="modal"
+              data-target="#about_modal"
+              >About</a
+            >
+            <a class="nav-item nav-link" href="#"></a>
+            <a class="navbar-brand mx-2 d-none d-md-inline" href="#"
+              >SmartPredict</a
+            >
+            <a
+              class="btn nav-item nav-link"
+              href="#"
+              data-toggle="modal"
+              data-target="#instructions_modal"
+              >Instructions</a
+            >
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container-fluid">
+      <div class="col-sm-10" id="main-content">
+        <div class="row">
+          <input
+            type="text"
+            class="btn btn-outline-primary col-sm-4 predicted_word shiny-text-output"
+            id="second_word"
+            value=""
+          />
+          <input
+            type="text"
+            class="btn btn-outline-primary col-sm-4 predicted_word shiny-text-output"
+            id="first_word"
+            value=""
+          />
+          <input
+            type="text"
+            class="btn btn-outline-primary col-sm-4 predicted_word shiny-text-output"
+            id="third_word"
+            value=""
+          />
+        </div>
+        <div class="row">
+          <form class="col-sm-12">
+            <div class="input-group mb-3">
+              <input
+                type="text"
+                class="form-control form-control-lg col-xs-12"
+                placeholder="Enter a Word/Phrase or Click the Side Button for Inspiration"
+                id="to_predict_text_box"
+                name="to_predict"
+              />
+              <div class="input-group-append">
+                <button
+                  class="btn btn-outline-secondary"
+                  type="button"
+                  data-toggle="modal"
+                  data-target="#example_modal"
+                >
+                  <span class="fa fa-quote-right"></span>
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!--Modals-->
+    <div class="modal fade" id="instructions_modal">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Instructions</h5>
+            <button
+              type="button"
+              class="close"
+              data-dismiss="modal"
+              aria-label="Close"
+            >
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <p>
+              This application is called SmartPredict and contains a single text
+              box with three buttons on top. Each time a user updates input in
+              the text box, the application calls the server where a prediction
+              algorithm will spit out three words, each with accompanying
+              probabilities as to how likely they are to be the next word based
+              on what the user recently types.
+            </p>
+            <p>
+              The most probable word will then be supplied as value of the
+              middle button, the second and third words will then be supplied to
+              left and right buttons respectively. You can click on these
+              buttons to aid in fast typing, just like what you would do in
+              conventional smart keyboard interfaces.
+            </p>
+            <p>
+              You can copy one of the example inputs by clicking the button
+              beside the input text box.
+            </p>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-dismiss="modal"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal fade" id="about_modal">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">About</h5>
+            <button
+              type="button"
+              class="close"
+              data-dismiss="modal"
+              aria-label="Close"
+            >
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <p>
+              SmartPredict is an application that utilizes
+              <a
+                href="http://web.archive.org/web/20160318133851/http://www.corpora.heliohost.org:80/aboutcorpus.html"
+                >HC corpora</a
+              >
+              to make a model that would simulate aided word prediction via web
+              interface. To see the code and documentation, see the codebase on
+              this corresponding GitHub
+              <a
+                href="https://github.com/ArseniusNott/Exploring-the-Sample-English-Corpora-for-Predictive-Text-Modeling"
+                >link</a
+              >. If you want to know more information, please send me an email
+              <a href="mailto:anvillasoto@gmail.com">here</a>.
+            </p>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-dismiss="modal"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal fade" id="example_modal">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Examples</h5>
+            <button
+              type="button"
+              class="close"
+              data-dismiss="modal"
+              aria-label="Close"
+            >
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <p>
+              Copy one of the sentences below and paste it in the text box to
+              see the next predicted word.
+            </p>
+            <ul>
+              <li>Tale as old as time, song as old as rhyme, beauty and the</li>
+              <li>This is probably the best day of my</li>
+              <li>I want to dance and sing at the same</li>
+              <li>I want to meet the president of the United</li>
+              <li>It is really weird that I always wake up at three in the</li>
+            </ul>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-dismiss="modal"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <script src="shared/html5shiv.min.js"></script>
+    <script src="shared/respond.min.js"></script>
+
+    <!--Custom Script-->
+    <script src="deps/js/custom_script.js"></script>
+  </body>
+</html>

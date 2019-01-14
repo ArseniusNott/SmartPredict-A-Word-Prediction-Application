@@ -1,0 +1,37 @@
+#main-content {
+  margin:auto;
+  padding-top:100px;
+}
+
+.middle {
+  position: absolute;
+  top: 50%;
+  left: 45%;
+}
+
+.btn {
+  border-radius: 0rem;
+  caret-color: transparent !important;
+}
+
+form.col-sm-12 {
+  padding-left: 0px;
+  padding-right: 0px;
+}
+
+  .form-control-lg {
+    border-radius: 0rem;
+  }
+
+.navbar-dark .navbar-nav .nav-link {
+  color: rgba(255,255,255,0.9);
+}
+
+input {
+  text-align: center;
+  height: 50px;
+}
+
+.form-control-lg {
+  height: 50px;
+}
